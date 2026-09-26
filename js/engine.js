@@ -147,9 +147,10 @@ const Sound = {
   },
   pick() { this.tone(500, { dur: 0.08, to: 800, vol: 0.12 }); },
   tap() { this.tone(800, { dur: 0.05, vol: 0.1 }); },
-  good() { [660, 880, 1175].forEach((f, i) => this.tone(f, { dur: 0.18, at: i * 0.07, vol: 0.15, type: 'triangle' })); },
+  good() { Mascot.react('cheer'); [660, 880, 1175].forEach((f, i) => this.tone(f, { dur: 0.18, at: i * 0.07, vol: 0.15, type: 'triangle' })); },
   /* Wrong answers get a silly sound — toddlers love these, so keep them playful, never harsh. */
   bad() {
+    Mascot.react('oops');
     const silly = [
       () => { this.tone(400, { dur: 0.35, to: 120, type: 'sine', vol: 0.25 }); }, // slide whistle down
       () => { [0, 0.12, 0.24].forEach((at) => this.tone(180, { dur: 0.1, at, to: 320, type: 'triangle', vol: 0.2 })); }, // boing-boing
@@ -161,12 +162,19 @@ const Sound = {
   flip() { this.tone(700, { dur: 0.06, to: 1000, vol: 0.08 }); },
   chomp() { [0, 0.14].forEach((at) => this.tone(220, { dur: 0.08, at, to: 120, type: 'square', vol: 0.08 })); },
   honk() { this.tone(330, { dur: 0.18, type: 'square', vol: 0.07 }); this.tone(330, { dur: 0.25, at: 0.25, type: 'square', vol: 0.07 }); },
-  tada() { [523, 659, 784, 1047, 784, 1047].forEach((f, i) => this.tone(f, { dur: 0.22, at: i * 0.1, vol: 0.16, type: 'triangle' })); },
+  tada() { Mascot.react('cheer'); [523, 659, 784, 1047, 784, 1047].forEach((f, i) => this.tone(f, { dur: 0.22, at: i * 0.1, vol: 0.16, type: 'triangle' })); },
 };
 
 /* ---------- Voice (built-in speech synthesis) ---------- */
 const Voice = {
   voice: null,
+  unlocked: false,
+  /* iOS only allows speech after one utterance started inside a tap; call from tap handlers. */
+  unlock() {
+    if (this.unlocked || !('speechSynthesis' in window)) return;
+    this.unlocked = true;
+    try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch { /* ignore */ }
+  },
   choose() {
     const en = speechSynthesis.getVoices().filter((v) => /^en/i.test(v.lang));
     this.voice = en.find((v) => /samantha|karen|moira|tessa|google us english|female/i.test(v.name)) || en[0] || null;
@@ -181,11 +189,45 @@ const Voice = {
       u.lang = this.voice?.lang || 'en-US';
       u.rate = 0.9;
       u.pitch = 1.25;
+      u.onstart = () => Mascot.talk(true);
+      u.onend = u.onerror = () => Mascot.talk(false);
       speechSynthesis.speak(u);
     } catch { /* speech unavailable */ }
   },
 };
 if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => Voice.choose();
+
+/* ---------- Mascot: Ollie the octopus — talks with the voice, cheers and says "oops" ---------- */
+const Mascot = {
+  svg() {
+    const tentacle = (x, d) => `<path class="tt" style="animation-delay:${d}s" d="M${x} 72 q-6 16 0 26 q5 9 -3 16" stroke="#8a45e6" stroke-width="11" fill="none" stroke-linecap="round"/>`;
+    return `<svg viewBox="0 0 120 130" class="shape-svg"><g class="body">
+      ${[34, 48, 62, 76, 88].map((x, i) => tentacle(x, -i * 0.25)).join('')}
+      <ellipse cx="60" cy="50" rx="42" ry="40" fill="#a45cff"/>
+      <ellipse cx="46" cy="28" rx="12" ry="7" fill="#fff" opacity=".3" transform="rotate(-25 46 28)"/>
+      <circle cx="34" cy="62" r="7" fill="#ff8fab" opacity=".7"/><circle cx="86" cy="62" r="7" fill="#ff8fab" opacity=".7"/>
+      <g class="eyes">
+        <circle cx="46" cy="48" r="10" fill="#fff"/><circle cx="74" cy="48" r="10" fill="#fff"/>
+        <circle cx="48" cy="50" r="5.5" fill="#222"/><circle cx="76" cy="50" r="5.5" fill="#222"/>
+        <circle cx="50" cy="47" r="2" fill="#fff"/><circle cx="78" cy="47" r="2" fill="#fff"/>
+      </g>
+      <path class="m-smile" d="M50 64 Q60 74 70 64" stroke="#222" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <ellipse class="m-talk" cx="60" cy="68" rx="7" ry="6" fill="#c2334d" stroke="#222" stroke-width="3"/>
+      <ellipse class="m-oops" cx="60" cy="69" rx="4.5" ry="5" fill="#222"/>
+    </g></svg>`;
+  },
+  el(cls = '') { return h('div', { class: `mascot ${cls}`, html: Mascot.svg(), 'aria-hidden': 'true' }); },
+  talk(on) { document.querySelectorAll('.mascot').forEach((m) => m.classList.toggle('talk', on)); },
+  react(kind) {
+    document.querySelectorAll('.mascot').forEach((m) => {
+      m.classList.remove('cheer', 'oops');
+      void m.offsetWidth;
+      m.classList.add(kind);
+      clearTimeout(m._t);
+      m._t = setTimeout(() => m.classList.remove(kind), 900);
+    });
+  },
+};
 
 /* ---------- Engine: per-game timers & prompts, cleared on exit ---------- */
 const Engine = {
@@ -360,7 +402,7 @@ const Reward = {
     Voice.say(U.pick(PRAISE));
     Fx.confetti();
     App.addStar();
-    App.stage?.append(h('div', { class: 'celebrate' }, h('div', { class: 'big-star' }, '⭐')));
+    App.stage?.append(h('div', { class: 'celebrate' }, h('div', { class: 'big-star' }, '⭐'), Mascot.el('dance')));
     Engine.later(next, 2400);
   },
 };
@@ -405,44 +447,83 @@ const App = {
     return btn;
   },
 
-  home(fromGame = true) {
-    Engine.reset();
-    this.stage = null;
-    if (fromGame && history.state?.game) history.back();
-    const tiles = Games.list.map((g, i) =>
-      h('button', {
-        class: 'tile',
-        style: { '--bg': g.bg, 'animation-delay': i * 40 + 'ms' },
-        onclick: () => this.play(g),
-      }, h('span', { class: 'tile-icon' }, g.icon), h('span', { class: 'tile-title' }, g.title)),
-    );
-    this.root.replaceChildren(
-      h('div', { class: 'screen home' },
-        h('header', { class: 'home-bar' },
-          h('h1', {}, h('span', {}, 'Tiny'), h('span', {}, 'Play')),
-          h('div', { class: 'bar-right' }, this.starBadge(), this.muteButton())),
-        h('main', { class: 'tiles' }, tiles)),
-    );
+  /* Bubble wipe: a circle of `color` grows from (x, y), the screen swaps underneath, then it fades. */
+  wipeToken: 0,
+  wipe(color, icon, x, y, swap) {
+    const token = ++this.wipeToken;
+    x ??= innerWidth / 2;
+    y ??= innerHeight / 2;
+    const r = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+    const w = h('div', { class: 'wipe', style: { background: color } },
+      icon ? h('div', { class: 'wipe-icon' }, icon) : null,
+      Array.from({ length: 8 }, (_, i) => h('i', { style: { left: 8 + i * 12 + '%', 'animation-delay': (i % 4) * 60 + 'ms' } })));
+    document.body.append(w);
+    w.animate(
+      [{ clipPath: `circle(0px at ${x}px ${y}px)` }, { clipPath: `circle(${r}px at ${x}px ${y}px)` }],
+      { duration: 420, easing: 'cubic-bezier(.6,0,.35,1)', fill: 'forwards' },
+    ).onfinish = () => {
+      if (token === this.wipeToken) swap();
+      w.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: 120, fill: 'forwards' }).onfinish = () => w.remove();
+    };
   },
 
-  play(game) {
+  ocean() {
+    const bubbles = Array.from({ length: 14 }, () => {
+      const s = U.rand(1.5, 5);
+      return h('i', { class: 'bubble', style: { left: U.rand(0, 100) + '%', width: s + 'vmin', height: s + 'vmin', 'animation-duration': U.rand(7, 16) + 's', 'animation-delay': -U.rand(0, 16) + 's' } });
+    });
+    const fish = ['🐠', '🐟', '🐡', '🐢'].map((f, i) =>
+      h('span', { class: `swimmer ${i % 2 ? 'rtl' : ''}`, style: { top: 30 + i * 16 + '%', 'animation-duration': 18 + i * 5 + 's', 'animation-delay': -i * 6 + 's' } }, f));
+    const weeds = [4, 22, 71, 90].map((x, i) => h('span', { class: 'weed', style: { left: x + '%', 'animation-delay': -i * 0.7 + 's' } }, '🌿'));
+    return h('div', { class: 'ocean', 'aria-hidden': 'true' }, bubbles, fish, weeds, h('div', { class: 'sand' }));
+  },
+
+  home(fromGame = true) {
     Engine.reset();
-    Sound.ac(); // unlock audio inside the tap gesture
+    if (fromGame && history.state?.game) history.back();
+    const render = () => {
+      this.stage = null;
+      const tiles = Games.list.map((g, i) =>
+        h('button', {
+          class: 'tile',
+          style: { '--bg': g.bg, 'animation-delay': i * 35 + 'ms' },
+          onclick: (e) => this.play(g, e),
+        }, h('span', { class: 'tile-icon' }, g.icon), h('span', { class: 'tile-title' }, g.title)),
+      );
+      this.root.replaceChildren(
+        h('div', { class: 'screen home' },
+          this.ocean(),
+          h('header', { class: 'home-bar' },
+            h('div', { class: 'brand' }, Mascot.el('wave'), h('h1', {}, h('span', {}, 'Tiny'), h('span', {}, 'Play'))),
+            h('div', { class: 'bar-right' }, this.starBadge(), this.muteButton())),
+          h('main', { class: 'tiles' }, tiles)),
+      );
+    };
+    if (!this.root.firstChild) render();
+    else this.wipe('#8fdcff', '🏠', null, null, render);
+  },
+
+  play(game, ev) {
+    Engine.reset();
+    Sound.ac(); // unlock audio + speech inside the tap gesture
+    Voice.unlock();
     Sound.tap();
     history.pushState({ game: game.id }, '');
-    const stage = h('main', { class: `stage game-${game.id}`, style: { '--bg': game.bg } });
-    this.stage = stage;
-    this.root.replaceChildren(
-      h('div', { class: 'screen game' },
-        h('header', { class: 'game-bar', style: { '--bg': game.bg } },
-          h('button', { class: 'icon-btn home-btn', 'aria-label': 'Home', onclick: () => this.home() }, '🏠'),
-          h('div', { class: 'game-title' }, game.icon + ' ' + game.title),
-          h('div', { class: 'bar-right' },
-            h('button', { class: 'icon-btn', 'aria-label': 'Say it again', onclick: () => Voice.say(Engine.promptText) }, '💬'),
-            this.starBadge())),
-        stage),
-    );
-    game.start(stage);
+    this.wipe(game.bg, game.icon, ev?.clientX, ev?.clientY, () => {
+      const stage = h('main', { class: `stage game-${game.id}`, style: { '--bg': game.bg } });
+      this.stage = stage;
+      this.root.replaceChildren(
+        h('div', { class: 'screen game' },
+          h('header', { class: 'game-bar', style: { '--bg': game.bg } },
+            h('button', { class: 'icon-btn home-btn', 'aria-label': 'Home', onclick: () => this.home() }, '🏠'),
+            h('div', { class: 'game-title' }, Mascot.el(), h('span', {}, game.title)),
+            h('div', { class: 'bar-right' },
+              h('button', { class: 'icon-btn', 'aria-label': 'Say it again', onclick: () => Voice.say(Engine.promptText) }, '💬'),
+              this.starBadge())),
+          stage),
+      );
+      game.start(stage);
+    });
   },
 };
 

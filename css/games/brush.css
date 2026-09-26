@@ -1,0 +1,58 @@
+/* ================= Brush Teeth ================= */
+.game-brush { justify-content: center; cursor: pointer; }
+.brush-char {
+  position: relative; width: min(92vw, 100vmin); max-height: 80%;
+  aspect-ratio: 400 / 320; animation: popIn .7s var(--pop) backwards;
+}
+.brush-char .brush-svg { filter: drop-shadow(0 1.4vmin 0 rgba(0, 0, 0, .1)); }
+.brush-body { transform-origin: 200px 310px; animation: brushBreathe 3s ease-in-out infinite; }
+@keyframes brushBreathe { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.015, .985) translateY(2px); } }
+.brush-char.giggle .brush-body { animation: brushGiggle .26s ease-in-out infinite; }
+@keyframes brushGiggle {
+  0%, 100% { transform: rotate(0) scale(1); }
+  25% { transform: rotate(-1.6deg) scale(1.01, .99); }
+  75% { transform: rotate(1.6deg) scale(.99, 1.01); }
+}
+.brush-happy-eyes { opacity: 0; }
+.brush-char.clean .eyes { opacity: 0; animation: none; }
+.brush-char.clean .brush-happy-eyes { opacity: 1; }
+.brush-char.clean .brush-body { animation: brushCheer .7s var(--pop) 2, brushBreathe 3s ease-in-out 1.4s infinite; }
+@keyframes brushCheer {
+  0% { transform: scale(1.06, .94); }
+  40% { transform: translateY(-18px) scale(.97, 1.04); }
+  70% { transform: translateY(0) scale(1.05, .95); }
+  100% { transform: none; }
+}
+.brush-char.clean .brush-teeth { filter: drop-shadow(0 0 6px #fff) brightness(1.05); }
+.brush-dirt { transition: opacity .15s; }
+
+.brush-twinkle {
+  position: absolute; font-size: 6vmin; transform: translate(-50%, -50%); pointer-events: none;
+  animation: brushTwinkle 1.1s ease-in-out infinite backwards;
+}
+@keyframes brushTwinkle {
+  0% { transform: translate(-50%, -50%) scale(0) rotate(0); opacity: 0; }
+  40% { transform: translate(-50%, -50%) scale(1.3) rotate(40deg); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(.6) rotate(90deg); opacity: 0; }
+}
+
+.brush-tool {
+  position: absolute; left: 0; top: 0; width: 30vmin; height: calc(30vmin * 70 / 220);
+  pointer-events: none; z-index: 20;
+  filter: drop-shadow(0 .8vmin 0 rgba(0, 0, 0, .15));
+}
+/* resting in the corner, gently bobbing to invite a grab */
+.brush-tool:not(.active) svg { animation: brushInvite 1.8s ease-in-out infinite; transform-origin: 15% 30%; }
+@keyframes brushInvite {
+  0%, 100% { transform: rotate(-18deg) translateY(0); }
+  50% { transform: rotate(-26deg) translateY(-1.5vmin); }
+}
+.brush-tool.active { filter: drop-shadow(0 2vmin 1.5vmin rgba(0, 0, 0, .25)); }
+.brush-tool.active svg { animation: brushScrub .18s ease-in-out infinite alternate; transform-origin: 15% 30%; }
+@keyframes brushScrub { from { transform: translateX(-3px); } to { transform: translateX(3px); } }
+
+.brush-foam {
+  position: absolute; border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #fff, #eaf8ff 60%, #cdefff);
+  box-shadow: inset 0 0 0 1.5px rgba(150, 210, 240, .7);
+}

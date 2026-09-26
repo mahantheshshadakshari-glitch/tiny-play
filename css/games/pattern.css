@@ -1,0 +1,100 @@
+/* ================= Pattern Train ================= */
+.game-pattern {
+  --w: min(14vmin, calc((100vw - 8vmin) / 7.9));
+  background:
+    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, .6) 0 9vmin, transparent 9.2vmin),
+    radial-gradient(circle at 85% 12%, rgba(255, 255, 255, .5) 0 6vmin, transparent 6.2vmin),
+    linear-gradient(var(--bg) 62%, #c9eb9b 62.2%);
+}
+.pattern-track { position: relative; width: 100%; display: flex; justify-content: center; padding-bottom: calc(var(--w) * .25); }
+.pattern-rails {
+  position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--w) * .28);
+  background:
+    linear-gradient(#8d6e63, #8d6e63) 0 0 / 100% 18% no-repeat,
+    repeating-linear-gradient(90deg, #a1887f 0 calc(var(--w) * .12), transparent calc(var(--w) * .12) calc(var(--w) * .4));
+}
+.pattern-train { display: flex; align-items: flex-end; gap: calc(var(--w) * .14); position: relative; z-index: 1; animation: patternArrive 1.7s cubic-bezier(.2, .9, .3, 1.08) backwards; }
+@keyframes patternArrive {
+  0% { transform: translateX(110vw); }
+  82% { transform: translateX(-1.5vmin); }
+  92% { transform: translateX(.6vmin); }
+  100% { transform: translateX(0); }
+}
+.pattern-train.go { animation: patternLeave 1.5s cubic-bezier(.55, 0, .9, .5) forwards; }
+@keyframes patternLeave {
+  0% { transform: translateX(0); }
+  15% { transform: translateX(1.5vmin); }
+  100% { transform: translateX(-140vw); }
+}
+
+/* Locomotive (faces left, pulling the wagons) */
+.pattern-loco { position: relative; width: calc(var(--w) * 1.55); height: calc(var(--w) * 1.45); flex: none; animation: patternChug .45s ease-in-out infinite alternate; }
+@keyframes patternChug { from { transform: translateY(0); } to { transform: translateY(calc(var(--w) * -.03)) scale(1.01, .99); } }
+.pattern-boiler {
+  position: absolute; left: calc(var(--w) * .1); bottom: calc(var(--w) * .28); width: calc(var(--w) * .95); height: calc(var(--w) * .68);
+  background: linear-gradient(#5ab0ff, #2f7fe0); border-radius: calc(var(--w) * .34) calc(var(--w) * .1) calc(var(--w) * .1) calc(var(--w) * .34);
+  box-shadow: inset 0 calc(var(--w) * -.08) 0 rgba(0, 0, 0, .15);
+}
+.pattern-cab {
+  position: absolute; right: 0; bottom: calc(var(--w) * .28); width: calc(var(--w) * .62); height: calc(var(--w) * 1.08);
+  background: linear-gradient(#ff7070, #e24848); border-radius: calc(var(--w) * .12) calc(var(--w) * .12) calc(var(--w) * .06) calc(var(--w) * .06);
+  box-shadow: inset 0 calc(var(--w) * -.08) 0 rgba(0, 0, 0, .15);
+}
+.pattern-cab::before { content: ''; position: absolute; left: calc(var(--w) * -.06); right: calc(var(--w) * -.06); top: calc(var(--w) * -.1); height: calc(var(--w) * .14); background: #c73a3a; border-radius: calc(var(--w) * .06); }
+.pattern-window { position: absolute; left: 18%; right: 18%; top: 16%; height: 34%; background: #e3f5ff; border-radius: calc(var(--w) * .08); }
+.pattern-chimney {
+  position: absolute; left: calc(var(--w) * .42); bottom: calc(var(--w) * .92); width: calc(var(--w) * .24); height: calc(var(--w) * .34);
+  background: #444; border-radius: calc(var(--w) * .1) calc(var(--w) * .1) calc(var(--w) * .03) calc(var(--w) * .03);
+}
+.pattern-chimney::before { content: ''; position: absolute; left: -25%; right: -25%; top: -12%; height: 28%; background: #333; border-radius: calc(var(--w) * .06); }
+.pattern-face {
+  position: absolute; left: calc(var(--w) * -.12); bottom: calc(var(--w) * .26); width: calc(var(--w) * .74); height: calc(var(--w) * .74);
+  background: #ffd23d; border-radius: 50%; box-shadow: inset 0 0 0 calc(var(--w) * .05) #e5b820;
+}
+.pattern-train.go .pattern-face .mouth { opacity: 0; }
+.pattern-train.go .pattern-face .grin { opacity: 1; }
+.pattern-puff {
+  position: fixed; width: 5vmin; height: 5vmin; border-radius: 50%; pointer-events: none;
+  background: radial-gradient(circle at 35% 35%, #fff, #dcdcdc 55%, #b8b8b8); box-shadow: 0 0 0 .3vmin rgba(0, 0, 0, .06);
+}
+
+/* Wheels */
+.pattern-wheel {
+  position: absolute; bottom: 0; width: calc(var(--w) * .34); height: calc(var(--w) * .34); border-radius: 50%;
+  background:
+    linear-gradient(90deg, transparent 44%, #bbb 44% 56%, transparent 56%),
+    linear-gradient(transparent 44%, #bbb 44% 56%, transparent 56%),
+    radial-gradient(circle, #ddd 0 18%, #333 20% 100%);
+  border: calc(var(--w) * .035) solid #222;
+}
+.pattern-wheel.big { width: calc(var(--w) * .46); height: calc(var(--w) * .46); }
+.pattern-loco .w-a { left: calc(var(--w) * .18); }
+.pattern-loco .w-b { right: calc(var(--w) * .06); }
+.pattern-wagon .w-a { left: 8%; }
+.pattern-wagon .w-b { right: 8%; }
+.pattern-train.moving .pattern-wheel { animation: spin .35s linear infinite; }
+.pattern-train.go .pattern-wheel { animation-duration: .18s; }
+
+/* Wagons */
+.pattern-wagon { position: relative; width: var(--w); height: calc(var(--w) * 1.25); flex: none; }
+.pattern-wagon::before { /* coupling bar to the car in front */
+  content: ''; position: absolute; left: calc(var(--w) * -.18); bottom: calc(var(--w) * .34); width: calc(var(--w) * .24); height: calc(var(--w) * .06); background: #555; border-radius: 99px;
+}
+.pattern-car {
+  position: absolute; left: 0; right: 0; bottom: calc(var(--w) * .16); height: calc(var(--w) * .42);
+  background: var(--wc); border-radius: calc(var(--w) * .08) calc(var(--w) * .08) calc(var(--w) * .14) calc(var(--w) * .14);
+  box-shadow: inset 0 calc(var(--w) * -.07) 0 rgba(0, 0, 0, .15);
+}
+.pattern-item, .pattern-slot { position: absolute; left: 8%; right: 8%; bottom: calc(var(--w) * .38); aspect-ratio: 1; z-index: 1; }
+.pattern-item { animation: bob 1.8s ease-in-out infinite; animation-delay: calc(var(--i) * -300ms); transform-origin: 50% 100%; }
+.pattern-item .emoji, .pattern-slot .emoji { font-size: calc(var(--w) * .72); }
+.pattern-slot .piece { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pattern-slot .piece .emoji { font-size: calc(var(--w) * .72); }
+.pattern-q {
+  position: absolute; inset: 6%; display: grid; place-items: center; border-radius: 50%;
+  font-size: calc(var(--w) * .55); font-weight: 800; color: #fff; background: rgba(58, 46, 92, .35);
+  border: calc(var(--w) * .04) dashed rgba(255, 255, 255, .9);
+  animation: patternPulse 1.1s ease-in-out infinite;
+}
+@keyframes patternPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); background: rgba(58, 46, 92, .5); } }
+.pattern-empty.drop-hover .pattern-q { background: rgba(255, 210, 61, .8); }

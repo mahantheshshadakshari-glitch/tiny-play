@@ -1,0 +1,71 @@
+/* ================= Pixel Art ================= */
+.game-pixel { justify-content: space-evenly; }
+.pix-frame {
+  padding: 2.4vmin; border-radius: 4vmin; background: #fff;
+  box-shadow: inset 0 -1.2vmin 0 rgba(0, 0, 0, .06), var(--shadow);
+  animation: popIn .6s var(--pop) backwards;
+}
+.pix-grid {
+  --cell: min(calc(84vw / var(--cols)), calc(56vh / var(--rows)), 8.5vmin);
+  display: grid; grid-template-columns: repeat(var(--cols), var(--cell)); grid-auto-rows: var(--cell);
+  gap: .5vmin; touch-action: none; transition: gap .4s ease;
+}
+.pix-blank { border-radius: 22%; }
+.pix-cell {
+  position: relative; border-radius: 22%; cursor: pointer;
+  background: radial-gradient(circle, color-mix(in srgb, var(--c) 55%, transparent) 0 22%, transparent 24%), #f3eee6;
+  box-shadow: inset 0 0 0 .25vmin rgba(0, 0, 0, .06);
+  animation: popIn .4s var(--pop) backwards; animation-delay: calc(var(--i) * 25ms + 150ms);
+}
+.pix-cell[data-c="W"] { background: radial-gradient(circle, #cfc6ba 0 22%, transparent 24%), #f3eee6; }
+.pix-cell::after {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; background: var(--c);
+  box-shadow: inset 0 -.5vmin 0 rgba(0, 0, 0, .12), inset 0 .4vmin 0 rgba(255, 255, 255, .35);
+  transform: scale(0); opacity: 0;
+}
+.pix-cell.filled::after { animation: pixFill .35s var(--pop) forwards; }
+@keyframes pixFill {
+  0% { transform: scale(0) rotate(-30deg); opacity: 1; }
+  60% { transform: scale(1.25) rotate(6deg); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+.pix-cell[data-c="W"].filled::after { box-shadow: inset 0 0 0 .3vmin #e2dbd0; }
+
+/* finished: grid lines melt away, the picture becomes one image */
+.pix-grid.done { gap: 0; }
+.pix-grid.done .pix-cell, .pix-grid.done .pix-cell::after { border-radius: 0; box-shadow: none; }
+.pix-grid.done .pix-cell { background: transparent; }
+.pix-grid.done .pix-cell.filled::after { animation: none; opacity: 1; transform: scale(1.08); }
+.pix-grid.done.bounce, .pix-grid.done { animation: pixJoy 1.2s var(--pop) .4s; }
+@keyframes pixJoy {
+  0% { transform: scale(1); }
+  20% { transform: scale(1.1, .92); }
+  40% { transform: scale(.95, 1.08) translateY(-3vmin) rotate(-3deg); }
+  60% { transform: scale(1.05, .96) rotate(3deg); }
+  100% { transform: scale(1); }
+}
+
+/* palette */
+.pix-palette { display: flex; gap: 3.5vmin; justify-content: center; flex-wrap: wrap; padding: 1vmin; }
+.pix-color {
+  width: 15vmin; height: 15vmin; min-width: 56px; min-height: 56px; border-radius: 50%;
+  background: var(--c); position: relative;
+  box-shadow: inset 0 -1.2vmin 0 rgba(0, 0, 0, .18), inset 0 0 0 .5vmin rgba(255, 255, 255, .5), var(--shadow);
+  transition: transform .25s var(--pop);
+  animation: popIn .5s var(--pop) backwards; animation-delay: calc(var(--i) * 90ms + 300ms);
+}
+.pix-color[style*="#ffffff"] { box-shadow: inset 0 -1.2vmin 0 rgba(0, 0, 0, .1), inset 0 0 0 .5vmin #e6ded2, var(--shadow); }
+.pix-drop {
+  position: absolute; left: 26%; top: 18%; width: 22%; height: 22%; border-radius: 50%; background: rgba(255, 255, 255, .55);
+}
+.pix-color.on { transform: translateY(-2.5vmin) scale(1.12); }
+.pix-color.on::after {
+  content: ''; position: absolute; inset: -1.4vmin; border-radius: 50%; border: .9vmin solid var(--c);
+  opacity: .45; animation: pixRing 1.2s ease-in-out infinite;
+}
+@keyframes pixRing { 0%, 100% { transform: scale(1); opacity: .45; } 50% { transform: scale(1.1); opacity: .2; } }
+.pix-color.done::before {
+  content: '✔'; position: absolute; inset: 0; display: grid; place-items: center; font-size: 7vmin; color: #fff;
+  text-shadow: 0 .4vmin 0 rgba(0, 0, 0, .25);
+}
+.pix-color[style*="#ffffff"].done::before { color: #3ecf5a; }

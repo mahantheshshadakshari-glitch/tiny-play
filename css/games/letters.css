@@ -1,0 +1,50 @@
+/* ================= Letter Bubbles ================= */
+.game-letters { padding: 0; justify-content: flex-start; background: linear-gradient(#9fe0ff, #5bbcf0 60%, #3a9bd8); }
+.letters-sea { position: absolute; inset: 0; overflow: hidden; }
+.letters-sand { position: absolute; left: 0; right: 0; bottom: 0; height: 7vmin; background: #ffe2a8; border-radius: 50% 50% 0 0 / 2.4vmin 2.4vmin 0 0; }
+.letters-weed { position: absolute; bottom: 4vmin; font-size: 14vmin; transform-origin: 50% 100%; animation: sway 3s ease-in-out infinite; }
+.letters-weed.w1 { left: 3%; } .letters-weed.w2 { left: 46%; font-size: 10vmin; animation-delay: -1s; } .letters-weed.w3 { right: 4%; animation-delay: -2s; }
+.letters-fish { position: absolute; top: 55%; left: 0; font-size: 9vmin; animation: swim 22s linear infinite; opacity: .8; }
+
+.letters-hud {
+  position: relative; z-index: 5; margin-top: 2vmin; display: flex; flex-direction: column; align-items: center; gap: 1.5vmin;
+  pointer-events: none;
+}
+.letters-card {
+  display: flex; align-items: center; gap: 3vmin; padding: 1.5vmin 4vmin; background: #fff; border-radius: 5vmin;
+  box-shadow: var(--shadow); animation: popIn .6s var(--pop) backwards;
+}
+.letters-big { font-size: 15vmin; font-weight: 800; line-height: 1; color: #ff5d8f; animation: bob 2.2s ease-in-out infinite; }
+.letters-big small { font-size: .55em; color: #3d8bff; margin-left: .6vmin; }
+.letters-word { display: flex; flex-direction: column; align-items: center; font-size: 4.5vmin; font-weight: 800; }
+.letters-word .emoji { font-size: 11vmin; width: auto; height: auto; animation: sway 2.6s ease-in-out infinite; }
+.letters-slots { display: flex; gap: 1.4vmin; }
+.letters-slot {
+  width: 7.5vmin; height: 7.5vmin; border-radius: 50%; display: grid; place-items: center;
+  background: rgba(255, 255, 255, .45); box-shadow: inset 0 0 0 .5vmin rgba(255, 255, 255, .7);
+  font-size: 5vmin; font-weight: 800; color: #fff;
+}
+.letters-slot.on { background: #ff5d8f; box-shadow: 0 .6vmin 0 rgba(0, 0, 0, .15); }
+
+/* Bubbles: shiny, wobbling, letter inside */
+.letters-bubble { position: absolute; bottom: -22vmin; z-index: 2; cursor: pointer; touch-action: none; }
+.letters-inner {
+  width: 100%; height: 100%; border-radius: 50%; display: grid; place-items: center; position: relative;
+  background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, .95) 0 8%, rgba(255, 255, 255, .25) 22%, color-mix(in srgb, var(--tint) 35%, transparent) 70%, rgba(255, 255, 255, .55) 100%);
+  box-shadow: inset 0 0 0 .5vmin rgba(255, 255, 255, .75), inset -1.2vmin -1.6vmin 3vmin color-mix(in srgb, var(--tint) 45%, transparent);
+  animation: lettersWobble 2.4s ease-in-out infinite;
+}
+.letters-inner span { font-size: 9vmin; font-weight: 800; color: #3a2e5c; text-shadow: 0 .4vmin 0 rgba(255, 255, 255, .8); }
+@keyframes lettersWobble {
+  0%, 100% { transform: translateX(0) scale(1, 1); }
+  25% { transform: translateX(2.4vmin) scale(1.05, .95); }
+  50% { transform: translateX(0) scale(.96, 1.04); }
+  75% { transform: translateX(-2.4vmin) scale(1.04, .96); }
+}
+.letters-bubble.popping .letters-inner { animation: lettersPop .26s ease-out forwards; }
+@keyframes lettersPop { to { transform: scale(1.7); opacity: 0; } }
+.letters-bubble.letters-fade { opacity: 0; transition: opacity .6s; pointer-events: none; }
+.letters-fly {
+  position: fixed; z-index: 10; font-size: 10vmin; font-weight: 800; color: #ff5d8f; line-height: 1;
+  text-shadow: 0 .6vmin 0 #fff, 0 0 2vmin #fff;
+}

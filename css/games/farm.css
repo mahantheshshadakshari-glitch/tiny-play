@@ -1,0 +1,102 @@
+/* ================= Farm Friends ================= */
+.game-farm { justify-content: space-between; }
+.game-farm > .farm-top, .game-farm > .farm-field { position: relative; z-index: 1; }
+
+.farm-scene {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+  background: linear-gradient(#bfe9ff 0 42%, #a5e07f 42%, #86cf5c);
+}
+.farm-sun { position: absolute; right: 5%; top: 4%; font-size: 14vmin; animation: spin 20s linear infinite; }
+.farm-cloud { position: absolute; font-size: 13vmin; left: -20%; animation: drift 34s linear infinite; }
+.farm-cloud.f1 { top: 6%; } .farm-cloud.f2 { top: 20%; animation-delay: -17s; font-size: 10vmin; }
+.farm-hill {
+  position: absolute; left: -20%; right: -20%; top: 36%; bottom: 0;
+  background: linear-gradient(#b8ea8f, #8fd466 70%); border-radius: 50% 50% 0 0 / 12vmin 12vmin 0 0;
+}
+.farm-barn { position: absolute; left: 5%; top: calc(42% - 17vmin); width: 20vmin; height: 16vmin; background: #e5484d; border-radius: 1vmin; box-shadow: var(--shadow); }
+.farm-roof {
+  position: absolute; left: -2vmin; right: -2vmin; top: -8vmin; height: 9vmin; background: #b83238;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+.farm-door {
+  position: absolute; left: 50%; bottom: 0; width: 9vmin; height: 10vmin; margin-left: -4.5vmin; background: #fff;
+  border: .8vmin solid #fff; background: linear-gradient(45deg, transparent 46%, #e5484d 46% 54%, transparent 54%), linear-gradient(-45deg, transparent 46%, #e5484d 46% 54%, transparent 54%), #fff7ef;
+}
+.farm-fence {
+  position: absolute; left: 0; right: 0; top: calc(42% - 5vmin); height: 6vmin;
+  background:
+    linear-gradient(#fff 0 0) 0 30% / 100% .9vmin no-repeat,
+    linear-gradient(#fff 0 0) 0 75% / 100% .9vmin no-repeat,
+    repeating-linear-gradient(90deg, #fff 0 1.6vmin, transparent 1.6vmin 7vmin);
+  opacity: .9;
+}
+.farm-flower { position: absolute; bottom: 4%; left: 6%; font-size: 7vmin; transform-origin: 50% 100%; animation: sway 3s ease-in-out infinite; }
+.farm-flower.b { left: auto; right: 8%; bottom: 10%; animation-delay: -1s; }
+.farm-flower.c { left: 46%; bottom: 2%; animation-delay: -2s; font-size: 6vmin; }
+
+.farm-top { display: flex; flex-direction: column; align-items: center; gap: 1.5vmin; margin-top: 1vmin; }
+.farm-question {
+  display: flex; align-items: center; gap: 2vmin; background: #fff; border-radius: 99px;
+  padding: 1.5vmin 5vmin; font-size: 7vmin; font-weight: 800; box-shadow: var(--shadow);
+  animation: popIn .5s var(--pop) backwards;
+}
+.farm-q-icon { font-size: 6vmin; animation: bob 1.6s ease-in-out infinite; display: inline-block; }
+.farm-dots .pop-dot { background: #fff; }
+
+.farm-field {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 3vmin 8vmin; margin-bottom: 4vmin;
+}
+@media (orientation: landscape) { .farm-field { grid-template-columns: repeat(4, 1fr); gap: 5vmin; } }
+
+.farm-animal {
+  position: relative; width: 26vmin; height: 26vmin; touch-action: none;
+  animation: popIn .6s var(--pop) backwards; animation-delay: calc(var(--i) * 110ms + 150ms);
+}
+.farm-shadow {
+  position: absolute; left: 20%; right: 20%; bottom: 4%; height: 12%; border-radius: 50%;
+  background: rgba(0, 60, 0, .18); animation: farmShadow 2.6s ease-in-out infinite; animation-delay: calc(var(--i) * -650ms);
+}
+.farm-emoji {
+  font-size: 20vmin; transform-origin: 50% 90%;
+  animation: farmIdle 2.6s ease-in-out infinite; animation-delay: calc(var(--i) * -650ms);
+}
+@keyframes farmIdle {
+  0%, 100% { transform: rotate(-4deg) translateY(0); }
+  50% { transform: rotate(4deg) translateY(-4%) scale(1.02, .98); }
+}
+@keyframes farmShadow { 0%, 100% { transform: scaleX(1); } 50% { transform: scaleX(.9); } }
+.farm-animal.farm-hop .farm-emoji { animation: farmHop .6s var(--pop); }
+@keyframes farmHop {
+  0% { transform: scale(1.1, .9); }
+  35% { transform: translateY(-18%) scale(.95, 1.08); }
+  70% { transform: translateY(0) scale(1.08, .92); }
+  100% { transform: none; }
+}
+.farm-animal.farm-yay .farm-emoji { animation: farmYay .9s var(--pop); }
+@keyframes farmYay {
+  0% { transform: scale(1.2, .8); }
+  30% { transform: translateY(-40%) scale(.9, 1.15) rotate(-15deg); }
+  55% { transform: translateY(-45%) rotate(15deg); }
+  80% { transform: translateY(0) scale(1.15, .85); }
+  100% { transform: none; }
+}
+
+.farm-bubble {
+  position: absolute; left: 50%; top: -5vmin; z-index: 5; white-space: nowrap;
+  background: #fff; border-radius: 4vmin; padding: .6vmin 3vmin; font-size: 6vmin; font-weight: 800;
+  box-shadow: var(--shadow); transform: translateX(-50%); animation: farmBubble .45s var(--pop) backwards;
+}
+.farm-bubble::after {
+  content: ''; position: absolute; left: 50%; bottom: -2vmin; margin-left: -1.5vmin;
+  border: 1.5vmin solid transparent; border-top: 2vmin solid #fff; border-bottom: 0;
+}
+@keyframes farmBubble { from { transform: translateX(-50%) scale(0) rotate(-15deg); } }
+.farm-star { position: absolute; right: 4%; top: 4%; font-size: 6vmin; animation: popIn .5s var(--pop), bob 2s ease-in-out .5s infinite; }
+
+@media (orientation: portrait) {
+  .farm-field { gap: 12vw 8vw; margin-bottom: 8vh; }
+  .farm-animal { width: 36vw; height: 36vw; }
+  .farm-emoji { font-size: 27vw; }
+  .farm-bubble { font-size: 7vw; top: -8vw; }
+  .farm-star { font-size: 8vw; }
+}

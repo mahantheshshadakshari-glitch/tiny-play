@@ -1,8 +1,9 @@
 // Offline cache so the games work without internet once loaded.
-const CACHE = 'tiny-play-v3';
+const CACHE = 'tiny-play-v4';
 const FILES = [
   './', 'index.html', 'css/style.css', 'manifest.webmanifest', 'icons/icon.svg', 'js/engine.js',
-  ...['bus', 'shapes', 'feed', 'balloons', 'size', 'count', 'quantity', 'memory', 'tidy', 'find', 'shadow'].map((g) => `js/games/${g}.js`),
+  ...['bus', 'shapes', 'egg', 'feed', 'balloons', 'farm', 'size', 'potion', 'count', 'quantity', 'brush', 'memory', 'stickers', 'tidy', 'pattern', 'find', 'gifts', 'shadow', 'letters', 'pixel'].map((g) => `js/games/${g}.js`),
+  ...['egg', 'potion', 'farm', 'brush', 'stickers', 'pixel', 'pattern', 'gifts', 'letters'].map((g) => `css/games/${g}.css`),
 ];
 self.addEventListener('install', (e) => e.waitUntil(caches.open(CACHE).then((c) => c.addAll(FILES)).then(() => self.skipWaiting())));
 self.addEventListener('activate', (e) => e.waitUntil(
