@@ -1,0 +1,10 @@
+{
+  "name": "Tiny Play — Toddler Games",
+  "short_name": "Tiny Play",
+  "start_url": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#fff7e8",
+  "theme_color": "#fff7e8",
+  "icons": [{ "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}
