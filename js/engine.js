@@ -220,7 +220,7 @@ const Engine = {
 const Drag = {
   PAD: 24, // forgiving hit area for small fingers
 
-  make(el, { targets, onDrop }) {
+  make(el, { targets, onDrop, onTap }) {
     el.classList.add('draggable');
     // Stagger the pop-in entrance / idle bob by position in the tray.
     if (el.parentElement) el.style.setProperty('--i', [...el.parentElement.children].indexOf(el));
@@ -233,6 +233,7 @@ const Drag = {
       el.style.transition = 'none';
       Sound.pick();
       let over = null;
+      let moved = false;
 
       const hit = (x, y) =>
         targets().find((t) => {
@@ -242,6 +243,7 @@ const Drag = {
 
       const move = (ev) => {
         if (ev.pointerId !== e.pointerId) return;
+        if (Math.abs(ev.clientX - sx) + Math.abs(ev.clientY - sy) > 10) moved = true;
         el.style.transform = `translate(${ev.clientX - sx}px, ${ev.clientY - sy}px) scale(1.12)`;
         const t = hit(ev.clientX, ev.clientY);
         if (t !== over) {
@@ -257,6 +259,7 @@ const Drag = {
         el.removeEventListener('pointercancel', up);
         over?.classList.remove('drop-hover');
         el.classList.remove('dragging');
+        if (!moved && ev.type !== 'pointercancel' && onTap) { Drag.returnHome(el); onTap(el); return; }
         const t = ev.type === 'pointercancel' ? null : hit(ev.clientX, ev.clientY);
         const ok = t ? onDrop(el, t) : false;
         if (!ok) {

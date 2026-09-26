@@ -1,5 +1,5 @@
 // Offline cache so the games work without internet once loaded.
-const CACHE = 'tiny-play-v2';
+const CACHE = 'tiny-play-v3';
 const FILES = [
   './', 'index.html', 'css/style.css', 'manifest.webmanifest', 'icons/icon.svg', 'js/engine.js',
   ...['bus', 'shapes', 'feed', 'balloons', 'size', 'count', 'quantity', 'memory', 'tidy', 'find', 'shadow'].map((g) => `js/games/${g}.js`),
